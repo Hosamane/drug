@@ -431,6 +431,12 @@ def download():
     generate_pdf()
     return send_file(PDF_PATH, as_attachment=True)
 
+# if __name__ == '__main__':
+#     print("Starting Flask server...")
+#     app.run(debug=True, port=5000)
+
+
 if __name__ == '__main__':
-    print("Starting Flask server...")
-    app.run(debug=True, port=5000)
+    # print("Starting Flask server...")
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
