@@ -1,0 +1,42 @@
+[
+    {
+        "id": "c1788ac0-9dcd-40d4-a7d6-47c64478bbb0",
+        "name": "setty",
+        "dob": "2002-01-09",
+        "gender": "Male",
+        "email": "setty@gmail.com",
+        "password": "scrypt:32768:8:1$DGRxw5iQXHR4QaAf$9e482dc5d548b0fbc071e29a4b03a7aae287cb2b9f38fbf7f2831923c57836eff29c253d56b66ff24f11d96e98983f657d52b03fe1465e66bccbd5eb33690f19"
+    },
+    {
+        "id": "00117573-b592-4ee0-9a80-f045f807c7ec",
+        "name": "madhu",
+        "dob": "2222-04-01",
+        "gender": "Male",
+        "email": "madhu1@gmail.com",
+        "password": "scrypt:32768:8:1$drOhezNGZGHmLTSC$1b564fbcb1e6ebde74f5032053c0f8758f89ed7591d753202ba75b962a63cdd9996a21fca746abb2563ee78702e8bcb97c7ba6eaeb39a58bf9b3391eed591696"
+    },
+    {
+        "id": "92ef828f-f718-46be-9efd-a7542d9d97ba",
+        "name": "Madhu",
+        "dob": "2002-12-25",
+        "gender": "Male",
+        "email": "mad@gmail.com",
+        "password": "scrypt:32768:8:1$im9znWA00V56RGLZ$2126c2d6378e18f210ae2b034bfa36184c4617440fbf5f499f683feea5971cf0c99b1497cc5e5a51390d636626a8d93afd82dd0ff28dc754ff08f18433881fec"
+    },
+    {
+        "id": "ad3dbf13-c2af-4ce9-b3df-56d6b93a66a8",
+        "name": "Madhu",
+        "dob": "2025-05-28",
+        "gender": "Male",
+        "email": "admin11@gmail.com",
+        "password": "scrypt:32768:8:1$KFlHlLBkD0UfyIRC$e2ac04a2027c54d36e852859c65bdbbd80043c6df06a7272bf3637bb74267127d205713690fe30ba9c3dd0943d64b9e028adcba84aa10197136260b6ba1ea2c2"
+    },
+    {
+        "id": "7e388717-8523-4f2e-b4b7-a0d20f9b076d",
+        "name": "darshan",
+        "dob": "2025-05-01",
+        "gender": "Male",
+        "email": "admin@example.com",
+        "password": "scrypt:32768:8:1$lUlC01YVLibuI3Mq$a305fcf9a4a53065449f3a134246a951290909e5bddde0055d9a4573d4ee5a61a78ae500b7007a6113ba9890a5e1217d22595c54e2b7bfe5eb43a6017898cf42"
+    }
+]

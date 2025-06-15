@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Drug Recommendation Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            background-color: #343a40;
+        }
+
+        .sidebar a {
+            color: white;
+            padding: 15px;
+            display: block;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .dashboard-content {
+            padding: 30px;
+        }
+
+        .card-header {
+            background-color: #3498db;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-body {
+            font-size: 16px;
+            padding: 20px;
+        }
+
+        .btn-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn-custom {
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+        }
+
+        .save-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+        }
+
+        .save-btn:hover {
+            background-color: #1e8449;
+        }
+
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+            border: none;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        @media (max-width: 767px) {
+            .btn-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .sidebar {
+                height: auto;
+            }
+        }
+
+        .message {
+            font-weight: bold;
+            color: green;
+            margin-bottom: 20px;
+        }
+
+        /* Precaution alert style */
+        .precaution-alert {
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar d-flex flex-column justify-content-start p-0">
+                <h4 class="text-white text-center py-3 border-bottom">Dashboard</h4>
+                <a href="/"><i class="fa fa-home me-2"></i> Home</a>
+                <a href="/predict"><i class="fa fa-stethoscope me-2"></i> Predict</a>
+                <a href="/profile"><i class="fa fa-user me-2"></i> Profile</a>
+                <a href="/logout"><i class="fa fa-sign-out-alt me-2"></i> Logout</a>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 col-lg-10 dashboard-content">
+                <h2 class="text-center mb-4">💊 Your Drug Recommendation Results</h2>
+
+                {% if message %}
+                <div class="alert alert-success message" role="alert">
+                    {{ message }}
+                </div>
+                {% endif %}
+
+                {% if precaution %}
+                <div class="alert alert-warning precaution-alert" role="alert">
+                    <strong>⚠️ Precaution:</strong> {{ precaution }}
+                </div>
+                {% endif %}
+
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">🩺 Disease</div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ prediction }}</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">📋 Description</div>
+                            <div class="card-body">
+                                <p>{{ description }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- <div class="col">
+                            <div class="card h-100">
+                                <div class="card-header">💊 Medications</div>
+                                <div class="card-body">
+                                    {% if medications %}
+                                    <ul>
+                                        {% for item in medications %}
+                                        <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <p>No medication information available.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">💊 Precaution</div>
+                            <div class="card-body">
+                                {% if disease_precautions %}
+                                <ul>
+                                    {% for p in disease_precautions %}
+                                    <li>{{ p }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <p>No precautions available.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                     -->
+
+
+                    {% if disease_precautions %}
+                    <!-- Show Precautions card ONLY -->
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">💊 Precaution</div>
+                            <div class="card-body">
+                                <ul>
+                                    {% for p in disease_precautions %}
+                                    <li>{{ p }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% elif medications %}
+                    <!-- Show Medications card ONLY -->
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">💊 Medications</div>
+                            <div class="card-body">
+                                <ul>
+                                    {% for item in medications %}
+                                    <li>{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% else %}
+                    <!-- Neither medications nor precautions -->
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">Info</div>
+                            <div class="card-body">
+                                <p>No medication or precaution information available.</p>
+                            </div>
+                        </div>
+                    </div>          {% endif %}
+
+
+
+                
+              
+
+
+
+
+                <div class="btn-section mt-4">
+                    <form action="/save_history" method="POST" class="d-inline">
+                        <input type="hidden" name="symptoms" value="{{ symptoms }}">
+                        <input type="hidden" name="predicted_disease" value="{{ prediction }}">
+                        <button type="submit" class="btn btn-custom save-btn">💾 Save to History</button>
+                    </form>
+                    <a href="/logout" class="btn btn-custom logout-btn">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Drug Recommendation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .form-label {
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .btn-submit, .btn-voice, .btn-reset, .btn-clear-symptoms {
+            margin-top: 20px;
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+        .btn-submit {
+            background-color: #3498db;
+        }
+        .btn-submit:disabled {
+            background-color: #a1c4db;
+            cursor: not-allowed;
+        }
+        .btn-submit:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+        .btn-voice {
+            background-color: #2ecc71;
+            margin-left: 10px;
+        }
+        .btn-voice.active {
+            background-color: #27ae60;
+            box-shadow: 0 0 10px #27ae60;
+        }
+        .btn-voice:hover {
+            background-color: #27ae60;
+        }
+        .btn-reset {
+            background-color: #e67e22;
+            margin-left: 10px;
+        }
+        .btn-reset:hover {
+            background-color: #d35400;
+        }
+        .btn-clear-symptoms {
+            background-color: #e74c3c;
+            margin-left: 10px;
+        }
+        .btn-clear-symptoms:hover {
+            background-color: #c0392b;
+        }
+        .message {
+            color: red;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .user-info {
+            background-color: #e8f0fe;
+            padding: 15px;
+            border-left: 6px solid #3498db;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .user-info h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        #listening-indicator {
+            font-size: 14px;
+            color: green;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" role="main">
+        {% if session['name'] and session['user_id'] %}
+        <section class="user-info" role="region" aria-live="polite" aria-atomic="true" aria-label="User welcome information">
+            <h5>👋 Welcome, {{ session['name'] }}</h5>
+            <p><strong>Your Unique ID:</strong> {{ session['user_id'] }}</p>
+        </section>
+        {% endif %}
+
+        <h2 class="text-center mb-4">Drug Recommendation System</h2>
+        <a href="http://localhost:8501" target="_blank" rel="noopener" class="btn btn-primary mt-3" aria-label="Try AI Medical Diagnosis in a new tab">
+            Try AI Medical Diagnosis
+        </a>
+
+        {% if message %}
+            <p class="message" role="alert">{{ message }}</p>
+        {% endif %}
+
+        <form method="POST" novalidate id="recommendationForm" aria-describedby="formInstructions">
+            <p id="formInstructions" class="visually-hidden">Please fill all fields to enable prediction.</p>
+
+            <div class="mb-3">
+                <label for="age" class="form-label">Age:</label>
+                <input 
+                    type="number" 
+                    name="age" 
+                    id="age" 
+                    class="form-control" 
+                    required 
+                    min="1" 
+                    max="120"
+                    placeholder="Enter your age" 
+                    aria-describedby="ageHelp"
+                />
+                <div id="ageHelp" class="form-text">Please enter a valid age.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="gender" class="form-label">Gender:</label>
+                <select name="gender" id="gender" class="form-select" required aria-required="true" aria-describedby="genderHelp">
+                    <option value="" disabled selected>Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                </select>
+                <div id="genderHelp" class="form-text">Select your gender.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="symptoms" class="form-label">Enter Symptoms (comma-separated):</label>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="symptoms" 
+                        name="symptoms" 
+                        placeholder="e.g., headache, fever, cough" 
+                        class="form-control" 
+                        required 
+                        aria-required="true"
+                        aria-label="Symptoms input field"
+                    />
+                    <button 
+                        type="button" 
+                        class="btn btn-voice" 
+                        onclick="toggleSpeechRecognition()" 
+                        aria-label="Toggle voice input for symptoms"
+                        id="btnVoice"
+                        title="Click to speak your symptoms"
+                        aria-pressed="false"
+                    >🎤 Speak</button>
+                    <button 
+                        type="button" 
+                        class="btn btn-clear-symptoms" 
+                        onclick="clearSymptoms()" 
+                        aria-label="Clear symptoms input"
+                        title="Clear symptoms input"
+                    >✖ Clear</button>
+                </div>
+                <div id="listening-indicator" role="status" aria-live="polite" aria-atomic="true">🎙️ Listening...</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="pain_intensity" class="form-label">Pain Intensity:</label>
+                <select name="pain_intensity" id="pain_intensity" class="form-select" required aria-required="true" aria-describedby="painHelp">
+                    <option value="" disabled selected>Select</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <div id="painHelp" class="form-text">Select the intensity of your pain.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="duration_days" class="form-label">Duration of Symptoms (in days):</label>
+                <input 
+                    type="number" 
+                    name="duration_days" 
+                    id="duration_days" 
+                    class="form-control" 
+                    min="1" 
+                    max="365"
+                    required 
+                    placeholder="e.g., 3"
+                    aria-describedby="durationHelp"
+                />
+                <div id="durationHelp" class="form-text">Enter duration .</div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <input type="submit" class="btn btn-submit" value="Predict" id="btnPredict" disabled aria-disabled="true" />
+                <button type="button" class="btn btn-reset" id="btnReset" aria-label="Reset form">Reset</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal fade" id="resetConfirmModal" tabindex="-1" aria-labelledby="resetConfirmLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="resetConfirmLabel">Confirm Reset</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to reset the form? All entered data will be lost.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" id="confirmResetBtn" class="btn btn-danger">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const form = document.getElementById('recommendationForm');
+        const btnPredict = document.getElementById('btnPredict');
+        const btnReset = document.getElementById('btnReset');
+        const resetModal = new bootstrap.Modal(document.getElementById('resetConfirmModal'));
+        const confirmResetBtn = document.getElementById('confirmResetBtn');
+
+        // Enable Predict button only if form valid (simple check)
+        function validateForm() {
+            const age = document.getElementById('age').value.trim();
+            const gender = document.getElementById('gender').value;
+            const symptoms = document.getElementById('symptoms').value.trim();
+            const pain = document.getElementById('pain_intensity').value;
+            const duration = document.getElementById('duration_days').value.trim();
+
+            const isValid = age !== '' && !isNaN(age) && age >= 1 && age <= 120 &&
+                            gender !== '' &&
+                            symptoms !== '' &&
+                            pain !== '' &&
+                            duration !== '' && !isNaN(duration) && duration >= 1 && duration <= 365;
+
+            btnPredict.disabled = !isValid;
+            btnPredict.setAttribute('aria-disabled', !isValid);
+        }
+
+        form.addEventListener('input', validateForm);
+        window.addEventListener('load', validateForm);
+
+        // Reset button triggers confirmation modal
+        btnReset.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetModal.show();
+        });
+
+        confirmResetBtn.addEventListener('click', () => {
+            form.reset();
+            validateForm();
+            resetModal.hide();
+        });
+
+        // Speech recognition variables
+        let recognition = null;
+        let recognizing = false;
+
+        function toggleSpeechRecognition() {
+            const btnVoice = document.getElementById("btnVoice");
+            const indicator = document.getElementById("listening-indicator");
+            const symptomsInput = document.getElementById("symptoms");
+
+            if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                alert("Speech recognition is not supported by your browser.");
+                return;
+            }
+
+            if (recognizing) {
+                recognition.stop();
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.continuous = false;
+
+            recognition.onstart = () => {
+                recognizing = true;
+                indicator.style.display = 'block';
+                btnVoice.classList.add('active');
+                btnVoice.setAttribute('aria-pressed', 'true');
+                btnVoice.title = 'Click to stop speaking';
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.trim();
+                if (symptomsInput.value) {
+                    // Append with comma separation, avoid duplicate comma
+                    symptomsInput.value = symptomsInput.value.trim().replace(/,+$/, '') + ', ' + transcript;
+                } else {
+                    symptomsInput.value = transcript;
+                }
+                validateForm();
+            };
+
+            recognition.onerror = (event) => {
+                alert("Speech recognition error: " + event.error);
+            };
+
+            recognition.onend = () => {
+                recognizing = false;
+                indicator.style.display = 'none';
+                btnVoice.classList.remove('active');
+                btnVoice.setAttribute('aria-pressed', 'false');
+                btnVoice.title = 'Click to speak your symptoms';
+            };
+
+            recognition.start();
+        }
+
+        // Clear symptoms input field
+        function clearSymptoms() {
+            const symptomsInput = document.getElementById('symptoms');
+            symptomsInput.value = '';
+            validateForm();
+            symptomsInput.focus();
+        }
+    </script>
+</body>
+</html>
